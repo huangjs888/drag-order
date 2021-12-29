@@ -1,5 +1,5 @@
 {
-  "name": "drag-order",
+  "name": "@huangjs888/drag-order",
   "version": "1.0.0",
   "description": "对栅栏结构里的item，实现拖拽，排序等操作",
   "main": "index.js",
@@ -11,6 +11,7 @@
     "url": "git+https://github.com/huangjs888/drag-order.git"
   },
   "keywords": [
+    "huangjs888",
     "drag",
     "order",
     "drag-order"
