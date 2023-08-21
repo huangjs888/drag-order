@@ -1,6 +1,6 @@
 {
   "name": "@huangjs888/drag-order",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "对栅栏结构里的item，实现拖拽，排序等操作",
   "main": "lib/index.js",
   "module": "es/index.js",
