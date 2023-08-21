@@ -7,10 +7,9 @@
  */
 
 import timer from './timer';
-
 const win = window;
 const doc = win.document;
-const noop = (v) => v;
+const noop = v => v;
 const eventTarget = {
   preventDefault: function preventDefault(e) {
     if (!e.preventDefault) {
@@ -54,7 +53,7 @@ const eventTarget = {
       element[`on${type}`] = null;
     }
     return this;
-  },
+  }
 };
 const findElement = function findElement(element, root, flag) {
   let target = element;
@@ -69,7 +68,7 @@ const findElement = function findElement(element, root, flag) {
 const getStyleSize = function getStyleSize(element, name) {
   if (!element || !name) return [0, 0, 0, 0];
   const computed = win.getComputedStyle(element, null);
-  return ['Top', 'Right', 'Bottom', 'Left'].map((expand) => {
+  return ['Top', 'Right', 'Bottom', 'Left'].map(expand => {
     let val = 0;
     const css = name + expand + (name === 'border' ? 'Width' : '');
     if (computed) {
@@ -86,13 +85,20 @@ const getElementRect = function getElementRect({
   children = null,
   devider = null,
   move = null,
-  drop = null,
+  drop = null
 } = {}) {
   if (!element) {
     return {};
   }
   // @ts-ignore
-  const { top, left, right, bottom, width, height } = element.getBoundingClientRect(); // 低版本浏览器也支持
+  const {
+    top,
+    left,
+    right,
+    bottom,
+    width,
+    height
+  } = element.getBoundingClientRect(); // 低版本浏览器也支持
   const rect = {
     element,
     top,
@@ -102,19 +108,15 @@ const getElementRect = function getElementRect({
     top$: top,
     bottom$: bottom,
     move: move || noop,
-    drop: drop || noop,
+    drop: drop || noop
   };
   if (!children) return rect;
   // !children.length:children不是子元素数组，取给定元素children的子元素否则直接取element的子元素，并且过滤掉text节点
-  const children$ = Array.prototype.slice
-    .call(
-      // @ts-ignore
-      !children.length
-        ? // @ts-ignore
-          (typeof children === 'object' && 'innerHTML' in children ? children : element).childNodes
-        : children,
-    )
-    .filter((child) => child.nodeType === 1);
+  const children$ = Array.prototype.slice.call(
+  // @ts-ignore
+  !children.length ?
+  // @ts-ignore
+  (typeof children === 'object' && 'innerHTML' in children ? children : element).childNodes : children).filter(child => child.nodeType === 1);
   if (children$.length > 0) {
     rect.children = children$;
     // @ts-ignore
@@ -133,8 +135,8 @@ const getElementRect = function getElementRect({
     // @ts-ignore
     rect.width = (width || element.offsetWidth) - padding[3] - padding[1] - border[3] - border[1]; // 父元素content宽度
     rect.height =
-      // @ts-ignore
-      (height || element.offsetHeight) - padding[0] - padding[2] - border[0] - border[2]; // 父元素content高度
+    // @ts-ignore
+    (height || element.offsetHeight) - padding[0] - padding[2] - border[0] - border[2]; // 父元素content高度
     // 每个子元素需要等宽高，等内外边距，等border，否则位置错乱
     const childMargin = getStyleSize(children0, 'margin');
     rect.childWidth = children0.offsetWidth + childMargin[3] + childMargin[1]; // content+padding+border+margin宽度
@@ -142,7 +144,11 @@ const getElementRect = function getElementRect({
     // @ts-ignore
     const devider$ = typeof devider === 'function' ? devider(element) : devider;
     if (devider$) {
-      const { wide = 1, color, className = '' } = devider$;
+      const {
+        wide = 1,
+        color,
+        className = ''
+      } = devider$;
       let deviderWidth = wide;
       let deviderHeight = wide;
       let vector;
@@ -155,10 +161,11 @@ const getElementRect = function getElementRect({
       }
       const el = doc.createElement('div');
       el.className = className;
-      el.style.cssText += `position:absolute;background:${
-        color || 'none'
-      };width:${deviderWidth}px;height:${deviderHeight}px;`;
-      let { offsetX = 0, offsetY = 0 } = devider$;
+      el.style.cssText += `position:absolute;background:${color || 'none'};width:${deviderWidth}px;height:${deviderHeight}px;`;
+      let {
+        offsetX = 0,
+        offsetY = 0
+      } = devider$;
       let inParent = false;
       if (children0.offsetParent === element) {
         // 如果子元素最近的相对定位元素正好是父元素element，则直接append父元素下，相对于父类的top和left要加上父类的padding
@@ -177,7 +184,7 @@ const getElementRect = function getElementRect({
         offsetX,
         offsetY,
         width: deviderWidth,
-        height: deviderHeight,
+        height: deviderHeight
       };
     }
     // 判断是否出现滚动条，是scrollHeight大于高度(content+padding+border)
@@ -185,8 +192,10 @@ const getElementRect = function getElementRect({
     const maxScrollTop = element.scrollHeight - (height || element.offsetHeight);
     if (maxScrollTop > 0) {
       // 如果目标元素有滚动条,移动时触发滚动条
-      rect.scroll = timer((vector) => {
-        let { scrollTop } = element;
+      rect.scroll = timer(vector => {
+        let {
+          scrollTop
+        } = element;
         if (vector === 'down' && scrollTop < maxScrollTop) {
           // @ts-ignore
           scrollTop += 3;
@@ -220,9 +229,13 @@ function dragOrder(elements, targets) {
   const elements$ = Array.isArray(elements) ? elements : [elements];
   const targets$ = Array.isArray(targets) ? targets : [targets];
   let isMouseDown = false;
-  elements$.forEach((el) => {
+  elements$.forEach(el => {
     if (!el) return;
-    const { bubble, element, helper } = el;
+    const {
+      bubble,
+      element,
+      helper
+    } = el;
     function mousedown(e) {
       const event = e || win.event;
       eventTarget.stopImmediatePropagation(event);
@@ -233,14 +246,14 @@ function dragOrder(elements, targets) {
       let isWorking = false;
       let mouseStart = {
         x: event.clientX,
-        y: event.clientY,
+        y: event.clientY
       };
       let helperStart = {
         el: null,
         x: 0,
         y: 0,
         l: 0,
-        t: 0,
+        t: 0
       };
       let hitRects = [];
       const docOffset = {
@@ -248,13 +261,16 @@ function dragOrder(elements, targets) {
         ct: doc.documentElement.clientTop || doc.body.clientTop || 0,
         cl: doc.documentElement.clientLeft || doc.body.clientLeft || 0,
         st: win.pageYOffset || doc.documentElement.scrollTop,
-        sl: win.pageXOffset || doc.documentElement.scrollLeft,
+        sl: win.pageXOffset || doc.documentElement.scrollLeft
       };
       function mousemove(ee) {
         const event2 = ee || win.event;
         eventTarget.preventDefault(event2);
         if (!isMouseDown) return;
-        const { clientX, clientY } = event2;
+        const {
+          clientX,
+          clientY
+        } = event2;
         const deltY = clientY - mouseStart.y;
         const deltX = clientX - mouseStart.x;
         // 上下左右移动在3像素以内不认为是要拖拽
@@ -266,7 +282,7 @@ function dragOrder(elements, targets) {
             offsetY = 0,
             className = '',
             domEl,
-            isMouse,
+            isMouse
           } = (typeof helper === 'function' ? helper(curItem) : helper) || {};
           let cssText = 'position:absolute;transition:none;opacity:1;';
           if (!domEl) {
@@ -283,14 +299,12 @@ function dragOrder(elements, targets) {
           helperStart.t = curItem.scrollTop;
           helperStart.l = curItem.scrollLeft;
           // 以下就是jquery的offset()方法的核心
-          helperStart.y =
-            (isMouse ? clientY : docOffset.gbcr.top) + offsetY + docOffset.st - docOffset.ct;
-          helperStart.x =
-            (isMouse ? clientX : docOffset.gbcr.left) + offsetX + docOffset.sl - docOffset.cl;
+          helperStart.y = (isMouse ? clientY : docOffset.gbcr.top) + offsetY + docOffset.st - docOffset.ct;
+          helperStart.x = (isMouse ? clientX : docOffset.gbcr.left) + offsetX + docOffset.sl - docOffset.cl;
           // @ts-ignore
           doc.body.appendChild(helperStart.el);
           // 循环获取每一个目标元素的位置尺寸信息
-          hitRects = targets$.map((t) => getElementRect(t));
+          hitRects = targets$.map(t => getElementRect(t));
         }
         // 设置helper元素位置
         // @ts-ignore
@@ -298,7 +312,7 @@ function dragOrder(elements, targets) {
         // @ts-ignore
         helperStart.el.style.left = `${helperStart.x + deltX}px`;
         // 循环每一个目标元素，进行比较确定撞击
-        hitRects.forEach((rect) => {
+        hitRects.forEach(rect => {
           if (rect.scroll) {
             // 处理定时器
             if (clientY >= rect.bottom$ && clientX < rect.right && clientX > rect.left) {
@@ -312,12 +326,7 @@ function dragOrder(elements, targets) {
               rect.scroll.stop();
             }
           }
-          if (
-            clientY < rect.bottom$ &&
-            clientY > rect.top$ &&
-            clientX < rect.right &&
-            clientX > rect.left
-          ) {
+          if (clientY < rect.bottom$ && clientY > rect.top$ && clientX < rect.right && clientX > rect.left) {
             // 鼠标移动到撞击元素范围内或父代理元素内
             if (rect.children) {
               // 表示撞击目标元素内部的子元素
@@ -330,23 +339,19 @@ function dragOrder(elements, targets) {
               const left$ = rect.left - 0; // 横向无滚动，所以为0
               const deltRectX = clientX - left$;
               const deltRectY = clientY - top$;
-              if (
-                (deltRectX > 0 &&
-                  deltRectX <= maxRows * rect.childWidth && // 被填满行的横向范围
-                  deltRectY > 0 &&
-                  deltRectY <= fullCols * rect.childHeight) || // 被填满行的竖向范围
-                (deltRectX > 0 &&
-                  deltRectX <= restCeils * rect.childWidth && // 未填满行的横向范围
-                  deltRectY > fullCols * rect.childHeight &&
-                  deltRectY <= (fullCols + 1) * rect.childHeight) // 未填满行的竖向范围
+              if (deltRectX > 0 && deltRectX <= maxRows * rect.childWidth &&
+              // 被填满行的横向范围
+              deltRectY > 0 && deltRectY <= fullCols * rect.childHeight ||
+              // 被填满行的竖向范围
+              deltRectX > 0 && deltRectX <= restCeils * rect.childWidth &&
+              // 未填满行的横向范围
+              deltRectY > fullCols * rect.childHeight && deltRectY <= (fullCols + 1) * rect.childHeight // 未填满行的竖向范围
               ) {
                 const rows = Math.ceil(deltRectX / rect.childWidth); // 在可移动范围内，鼠标移到横向第几列
                 const cols = Math.ceil(deltRectY / rect.childHeight); // 在可移动范围内，鼠标移到竖向第几行
                 if (rect.devider && rect.devider.el) {
-                  const deviderOffsetTop =
-                    rect.devider.offsetY + (rect.devider.inParent ? 0 : top$);
-                  const deviderOffsetLeft =
-                    rect.devider.offsetX + (rect.devider.inParent ? 0 : left$);
+                  const deviderOffsetTop = rect.devider.offsetY + (rect.devider.inParent ? 0 : top$);
+                  const deviderOffsetLeft = rect.devider.offsetX + (rect.devider.inParent ? 0 : left$);
                   let deviderPosition = '';
                   let deviderTop = 0;
                   let deviderLeft = 0;
@@ -357,16 +362,12 @@ function dragOrder(elements, targets) {
                       // 鼠标在当前元素左半边，分割线在当前元素左面
                       deviderPosition = 'left';
                       deviderTop = deviderOffsetTop + (cols - 1) * rect.childHeight;
-                      deviderLeft =
-                        deviderOffsetLeft +
-                        (rows - 1) * rect.childWidth -
-                        (rect.devider.width || 0) / 2;
+                      deviderLeft = deviderOffsetLeft + (rows - 1) * rect.childWidth - (rect.devider.width || 0) / 2;
                     } else {
                       // 鼠标在当前元素右半边，分割线在当前元素右面
                       deviderPosition = 'right';
                       deviderTop = deviderOffsetTop + (cols - 1) * rect.childHeight;
-                      deviderLeft =
-                        deviderOffsetLeft + rows * rect.childWidth - (rect.devider.width || 0) / 2;
+                      deviderLeft = deviderOffsetLeft + rows * rect.childWidth - (rect.devider.width || 0) / 2;
                     }
                   } else {
                     // 一行一个，上下排序
@@ -374,16 +375,12 @@ function dragOrder(elements, targets) {
                     if (deltRectY < colsMiddle) {
                       // 鼠标在当前元素上半边，分割线在当前元素上面
                       deviderPosition = 'top';
-                      deviderTop =
-                        deviderOffsetTop +
-                        (cols - 1) * rect.childHeight -
-                        (rect.devider.height || 0) / 2;
+                      deviderTop = deviderOffsetTop + (cols - 1) * rect.childHeight - (rect.devider.height || 0) / 2;
                       deviderLeft = deviderOffsetLeft + (rows - 1) * rect.childWidth;
                     } else {
                       // 鼠标在当前元素下半边，分割线在当前元素下面
                       deviderPosition = 'bottom';
-                      deviderTop =
-                        deviderOffsetTop + cols * rect.childHeight - (rect.devider.height || 0) / 2;
+                      deviderTop = deviderOffsetTop + cols * rect.childHeight - (rect.devider.height || 0) / 2;
                       deviderLeft = deviderOffsetLeft + (rows - 1) * rect.childWidth;
                     }
                   }
@@ -394,7 +391,9 @@ function dragOrder(elements, targets) {
                 const index = maxRows * (cols - 1) + rows;
                 const hitItem = rect.children[index - 1];
                 if (hitItem !== rect.hitItem) {
-                  const obj = { enter: hitItem }; // 当前元素触发进入
+                  const obj = {
+                    enter: hitItem
+                  }; // 当前元素触发进入
                   if (rect.hitItem) {
                     // 如果上一个存在，则上一个元素触发离开
                     obj.leave = rect.hitItem;
@@ -403,7 +402,9 @@ function dragOrder(elements, targets) {
                   rect.hitItem = hitItem;
                 } else {
                   // 元素没变化，触发移动
-                  rect.move({ move: rect.hitItem }, curItem, rect.element);
+                  rect.move({
+                    move: rect.hitItem
+                  }, curItem, rect.element);
                 }
               } else {
                 if (rect.hitItem) {
@@ -413,14 +414,18 @@ function dragOrder(elements, targets) {
                     rect.devider.el.style.left = `${-10 - rect.devider.width}px`;
                     rect.devider.position = null;
                   }
-                  rect.move({ leave: rect.hitItem }, curItem, rect.element);
+                  rect.move({
+                    leave: rect.hitItem
+                  }, curItem, rect.element);
                 }
                 rect.hitItem = null;
               }
             } else {
               const hitItem = rect.element;
               if (hitItem !== rect.hitItem) {
-                const obj = { enter: hitItem }; // 当前元素触发进入
+                const obj = {
+                  enter: hitItem
+                }; // 当前元素触发进入
                 if (rect.hitItem) {
                   // 如果上一个元素存在，则上一个元素触发离开
                   obj.leave = rect.hitItem;
@@ -429,7 +434,9 @@ function dragOrder(elements, targets) {
                 rect.hitItem = hitItem;
               } else {
                 // 元素没变化，触发移动
-                rect.move({ move: rect.hitItem }, curItem, rect.element);
+                rect.move({
+                  move: rect.hitItem
+                }, curItem, rect.element);
               }
             }
           } else {
@@ -441,7 +448,9 @@ function dragOrder(elements, targets) {
                 rect.devider.el.style.left = `${-10 - rect.devider.width}px`;
                 rect.devider.position = null;
               }
-              rect.move({ leave: rect.hitItem }, curItem, rect.element);
+              rect.move({
+                leave: rect.hitItem
+              }, curItem, rect.element);
             }
             rect.hitItem = null;
           }
@@ -455,11 +464,12 @@ function dragOrder(elements, targets) {
         isMouseDown = false;
         if (isWorking) {
           let back = true;
-          hitRects.forEach((rect) => {
+          hitRects.forEach(rect => {
             if (rect.scroll) {
               // 元素拖拽到范围之外，触发滚动条滚动，突然松开，应该停止滚动
               rect.scroll.stop(); // 停止滚动
             }
+
             let position;
             if (rect.devider && rect.devider.el) {
               // 获取分界线在撞击元素的位置
@@ -476,7 +486,7 @@ function dragOrder(elements, targets) {
           if (helperStart.el) {
             const style = {
               opacity: 0,
-              transition: 'top .3s, left .3s, opacity .3s',
+              transition: 'top .3s, left .3s, opacity .3s'
             };
             if (back) {
               // 表示一个撞击元素也没有，就直接返回了
@@ -484,7 +494,7 @@ function dragOrder(elements, targets) {
               style.top = `${helperStart.t + helperStart.y - curItem.scrollTop}px`;
               style.left = `${helperStart.l + helperStart.x - curItem.scrollLeft}px`;
             }
-            Object.keys(style).forEach((key) => {
+            Object.keys(style).forEach(key => {
               // @ts-ignore
               helperStart.el.style[key] = style[key];
             });
@@ -510,5 +520,4 @@ function dragOrder(elements, targets) {
     eventTarget.off(element, 'mousedown', mousedown).on(element, 'mousedown', mousedown);
   });
 }
-
 export default dragOrder;

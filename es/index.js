@@ -6,8 +6,7 @@
  * @Description: ******
  */
 
-import timer from './src/timer';
-import dragOrder from './src/drag-order';
-
+import timer from './timer';
+import dragOrder from './drag-order';
 export { timer };
 export default dragOrder;
